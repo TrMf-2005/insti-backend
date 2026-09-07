@@ -1,5 +1,4 @@
 // Ce fichier définit les "portes d'entrée" (routes) de notre API.
-// Chaque route correspond à une action possible sur les entreprises.
 
 const express = require('express');
 const router = express.Router();
@@ -27,22 +26,47 @@ router.get('/:departement', async (req, res) => {
 // POST /api/entreprises
 // Ajoute une nouvelle entreprise.
 // PROTÉGÉE : seul l'admin (avec le bon mot de passe) peut l'utiliser.
-// Corps attendu (JSON) : { "nom": "...", "ville": "...", "departement": "..." }
+// Corps attendu (JSON) : { "nom", "ville", "departement", "contact", "telephone" }
 // ---------------------------------------------------------
 router.post('/', adminAuth, async (req, res) => {
   try {
-    const { nom, ville, departement } = req.body;
+    const { nom, ville, departement, contact, telephone } = req.body;
 
     if (!nom || !ville || !departement) {
       return res.status(400).json({ erreur: 'Nom, ville et département sont requis.' });
     }
 
-    const nouvelleEntreprise = new Entreprise({ nom, ville, departement });
+    const nouvelleEntreprise = new Entreprise({ nom, ville, departement, contact, telephone });
     await nouvelleEntreprise.save();
 
     res.status(201).json(nouvelleEntreprise);
   } catch (erreur) {
     res.status(500).json({ erreur: 'Erreur serveur lors de l\'ajout.' });
+  }
+});
+
+// ---------------------------------------------------------
+// PATCH /api/entreprises/:id
+// Modifie une entreprise existante.
+// PROTÉGÉE : seul l'admin peut l'utiliser.
+// ---------------------------------------------------------
+router.patch('/:id', adminAuth, async (req, res) => {
+  try {
+    const { nom, ville, contact, telephone } = req.body;
+
+    const entrepriseModifiee = await Entreprise.findByIdAndUpdate(
+      req.params.id,
+      { nom, ville, contact, telephone },
+      { new: true, runValidators: true }
+    );
+
+    if (!entrepriseModifiee) {
+      return res.status(404).json({ erreur: 'Entreprise introuvable.' });
+    }
+
+    res.json(entrepriseModifiee);
+  } catch (erreur) {
+    res.status(500).json({ erreur: 'Erreur serveur lors de la modification.' });
   }
 });
 
