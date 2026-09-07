@@ -1,6 +1,4 @@
 // Ce fichier définit à quoi ressemble UNE entreprise dans la base de données.
-// C'est comme définir les colonnes d'un tableau Excel : chaque entreprise
-// aura obligatoirement un nom, une ville, et un département.
 
 const mongoose = require('mongoose');
 
@@ -15,6 +13,14 @@ const entrepriseSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  contact: {
+    type: String,
+    trim: true
+  },
+  telephone: {
+    type: String,
+    trim: true
+  },
   departement: {
     type: String,
     required: true,
@@ -23,6 +29,7 @@ const entrepriseSchema = new mongoose.Schema({
       'genie-mecanique',
       'maintenance-systemes',
       'genie-energetique',
+      'genie-electrique',
       'genie-electrique-informatique'
     ]
   },
